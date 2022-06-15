@@ -71,5 +71,5 @@ def validate_user_change_password(conn, cursor, email, old_password, new_passwor
         print(e)
 
 
-def close_db(conn):
-    conn.close()
+# def close_db(conn):
+#     conn.close()
