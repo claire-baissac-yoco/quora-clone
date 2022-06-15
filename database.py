@@ -44,6 +44,7 @@ def validate_user_login(conn, cursor, email, password):
         result = cursor.fetchone()
         print(result)
         first_name, last_name, hashed_password = result
+        print(hashed_password)
         return validate_user_password(bytes(hashed_password), password), {"first_name": first_name, "last_name": last_name}
     except Exception as e:
         print("Failed to login user")
@@ -52,14 +53,18 @@ def validate_user_login(conn, cursor, email, password):
 
 def validate_user_change_password(conn, cursor, email, old_password, new_password):
     print("VALIDATE USER CHANGE PASSWORD")
-    query = 'SELECT "password" FROM public.\"Users\" WHERE email = %s;'
+    query = 'SELECT "email", "password" FROM public.\"Users\" WHERE email = %s;'
+    query_change_password = 'UPDATE public.\"Users\" SET password = %s WHERE email = %s;'
     try:
         cursor.execute(query, (email,))
         result = cursor.fetchone()
-        print(result)
-        hashed_password = result
-        if validate_user_password(bytes(hashed_password), old_password) and user_password_is_valid(new_password):
-            return not old_password == new_password
+        ret_email, hashed_password = result
+        print(ret_email, bytes(hashed_password))
+        if validate_user_password(bytes(hashed_password), old_password) and user_password_is_valid(new_password) and not old_password == new_password:
+            cursor.execute(query_change_password,
+                           (encrypt_password(new_password), email))
+            conn.commit()
+            return True
         return False
     except Exception as e:
         print("Failed to change password")
