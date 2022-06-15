@@ -37,10 +37,20 @@ def decode_token(token):
     return payload
 
 
-def validate_user_info(email, password):
+def user_password_is_valid(password):
+    return len(password) >= 8
+
+
+def user_email_is_valid(email):
     regex = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
-    if len(password) < 8:
-        return False
-    elif not re.search(regex, email):
-        return False
-    return True
+    return re.search(regex, email)
+
+
+def validate_user_info(email, password):
+    return user_email_is_valid(email) and user_password_is_valid(password)
+
+
+def validate_user_password(actual_password_hashed, provided_password: str):
+    print("actual password hashed vs provided password")
+    print(actual_password_hashed, provided_password)
+    return bcrypt.checkpw(provided_password.encode('utf-8'), actual_password_hashed)
