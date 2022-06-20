@@ -7,7 +7,6 @@ import re
 import redis
 import yagmail
 import random
-import time
 
 load_dotenv()
 
