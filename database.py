@@ -27,25 +27,27 @@ def connect_db():
 
 
 def insert_user(conn, cursor, first_name, last_name, email, password):
-    query = 'INSERT INTO public.\"Users\" ("firstName", "lastName", "email", "password") VALUES (%s, %s, %s, %s);'
+    query = 'INSERT INTO public.\"Users\" ("firstName", "lastName", "email", "password") VALUES (%s, %s, %s, %s) RETURNING id;'
     try:
         cursor.execute(query, (first_name, last_name,
                        email, encrypt_password(password)))
+        id = cursor.fetchone()[0]
         conn.commit()
+        return id
     except Exception as e:
         print("Failed to insert into table")
         print(e)
 
 
 def validate_user_login(conn, cursor, email, password):
-    query = 'SELECT "firstName", "lastName", "password" FROM public.\"Users\" WHERE email = %s;'
+    query = 'SELECT "id", "firstName", "lastName", "password" FROM public.\"Users\" WHERE email = %s;'
     try:
         cursor.execute(query, (email,))
         result = cursor.fetchone()
         print(result)
-        first_name, last_name, hashed_password = result
+        id, first_name, last_name, hashed_password = result
         print(hashed_password)
-        return validate_user_password(bytes(hashed_password), password), {"first_name": first_name, "last_name": last_name}
+        return validate_user_password(bytes(hashed_password), password), {"first_name": first_name, "last_name": last_name, "id": id}
     except Exception as e:
         print("Failed to login user")
         print(e)

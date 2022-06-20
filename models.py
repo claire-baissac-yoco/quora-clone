@@ -13,6 +13,5 @@ class User(BaseModel):
     email: str
     password: str
 
-
 # class ChangePassword(BaseModel):
 #     password: str
