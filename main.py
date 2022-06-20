@@ -5,7 +5,8 @@ import os
 from dotenv import load_dotenv
 import uvicorn
 from models import CreateUser, User
-from database import connect_db, insert_user, validate_user_change_password, validate_user_login
+from database import insert_user, validate_user_change_password, validate_user_login
+from db_script import connect_db
 import utils
 
 load_dotenv()

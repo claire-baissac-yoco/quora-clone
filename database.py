@@ -17,12 +17,12 @@ def connect_db():
 
     cursor = conn.cursor()
 
-    # Executing an MYSQL function using the execute() method
-    cursor.execute("select version()")
+    # # Executing an MYSQL function using the execute() method
+    # cursor.execute("select version()")
 
-    # Fetch a single row using fetchone() method.
-    data = cursor.fetchone()
-    print("Connection established to: ", data)
+    # # Fetch a single row using fetchone() method.
+    # data = cursor.fetchone()
+    # print("Connection established to: ", data)
     return conn, cursor
 
 
