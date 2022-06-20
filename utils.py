@@ -79,6 +79,6 @@ def send_reset_password_email(user_email, user_name, user_id):
     sender_email = os.getenv("EMAIL_ADDRESS")
     yag = yagmail.SMTP(sender_email, password)
     contents = [f'Hi there, {user_name}! Here is the 5-digit code to reset your password: {code} :)',
-                'If you have not requested to reset your password, :( oh no']
+                'If you have not requested to reset your password :( oh no']
     print(contents)
     yag.send(to=user_email, subject='Reset your password', contents=contents)

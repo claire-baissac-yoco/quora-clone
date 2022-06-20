@@ -25,8 +25,11 @@ app = FastAPI()
 def verify_jwt_token(req: Request):
     token = req.headers['Authorization'].split(" ")[1]
     print(token)
-    decoded_token = utils.decode_token(token)
-    return True, decoded_token['email'], decoded_token['id'], decoded_token["name"]
+    try:
+        decoded_token = utils.decode_token(token)
+        return True, decoded_token['email'], decoded_token['id'], decoded_token["name"]
+    except:
+        return False
 
 
 @app.get('/')
@@ -77,7 +80,12 @@ def login_user(user: User):
 async def change_password_user(req: Request):
     if 'Authorization' not in req.headers:
         return JSONResponse(status_code=401, content={"success": False, "error": "Invalid header"})
-    authorized, email, _ = verify_jwt_token(req)
+    verify_token = verify_jwt_token(req)
+    if verify_token:
+        print(verify_token)
+        authorized, email, _, _ = verify_token
+    else:
+        return JSONResponse(status_code=401, content={"success": False, "error": "Invalid authorization token"})
     if authorized:
         request_body = await req.body()
         body_json = json.loads(request_body.decode('utf-8'))
