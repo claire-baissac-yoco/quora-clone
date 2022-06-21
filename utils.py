@@ -26,7 +26,8 @@ def generate_token(id, first_name, last_name, email):
         "name": f"{first_name} {last_name}",
         "email": email
     }
-    private_key = open('.ssh/id_rsa', 'r').read()
+    # open('.ssh/id_rsa', 'r').read()
+    private_key = os.environ.get("PRIVATE_KEY")
     password = os.environ.get("KEY_PASSWORD")
     print(password)
     key = serialization.load_ssh_private_key(
@@ -37,7 +38,8 @@ def generate_token(id, first_name, last_name, email):
 
 
 def decode_token(token):
-    public_key = open('.ssh/id_rsa.pub', 'r').read()
+    # open('.ssh/id_rsa.pub', 'r').read()
+    public_key = os.environ.get("PUBLIC_KEY")
     key = serialization.load_ssh_public_key(public_key.encode())
     payload = jwt.decode(jwt=token, key=key, algorithms=['RS256'])
     print(payload)
