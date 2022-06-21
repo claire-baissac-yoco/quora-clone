@@ -20,6 +20,7 @@ def encrypt_password(password: str):
 
 def generate_token(id, first_name, last_name, email):
     print(f"generate token: {id}, {first_name}, {last_name}, {email}")
+    print(f"os environ get: {os.environ.get('KEY_PASSWORD')}")
     payload_data = {
         "id": id,
         "name": f"{first_name} {last_name}",
@@ -27,6 +28,7 @@ def generate_token(id, first_name, last_name, email):
     }
     private_key = open('.ssh/id_rsa', 'r').read()
     password = os.getenv("KEY_PASSWORD")
+    print(password)
     key = serialization.load_ssh_private_key(
         private_key.encode(), password=password.encode('utf-8'))
     token = jwt.encode(payload=payload_data, key=key, algorithm='RS256')
