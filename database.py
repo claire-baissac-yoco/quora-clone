@@ -1,16 +1,16 @@
 import psycopg2
 import os
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 from utils import encrypt_password, user_password_is_valid, validate_user_password
 
 
 def connect_db():
-    load_dotenv()
-    DATABASE = os.getenv('DATABASE')
-    USER = os.getenv('USER')
-    PASSWORD = os.getenv('PASSWORD')
-    HOST = os.getenv('HOST')
-    DB_PORT = os.getenv('DB_PORT')
+    # load_dotenv()
+    DATABASE = os.environ.get('DATABASE')
+    USER = os.environ.get('USER')
+    PASSWORD = os.environ.get('PASSWORD')
+    HOST = os.environ.get('HOST')
+    DB_PORT = os.environ.get('DB_PORT')
 
     conn = psycopg2.connect(database=DATABASE, user=USER,
                             password=PASSWORD, host=HOST, port=DB_PORT)

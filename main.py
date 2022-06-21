@@ -2,15 +2,15 @@ import json
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 import os
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 import uvicorn
 from models import CreateUser, User
 from database import insert_user, validate_user_change_password, validate_user_login
 from db_script import connect_db
 import utils
 
-load_dotenv()
-PORT = int(os.getenv('PORT'))
+# load_dotenv()
+PORT = int(os.environ.get('PORT'))
 
 conn, cursor = connect_db()
 

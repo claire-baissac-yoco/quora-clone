@@ -1,14 +1,14 @@
 import bcrypt
 import jwt
 from cryptography.hazmat.primitives import serialization
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 import os
 import re
 import redis
 import yagmail
 import random
 
-load_dotenv()
+# load_dotenv()
 
 
 def encrypt_password(password: str):
@@ -27,7 +27,7 @@ def generate_token(id, first_name, last_name, email):
         "email": email
     }
     private_key = open('.ssh/id_rsa', 'r').read()
-    password = os.getenv("KEY_PASSWORD")
+    password = os.environ.get("KEY_PASSWORD")
     print(password)
     key = serialization.load_ssh_private_key(
         private_key.encode(), password=password.encode('utf-8'))
@@ -77,8 +77,8 @@ def gen_redis_code(user_id):
 
 def send_reset_password_email(user_email, user_name, user_id):
     code = gen_redis_code(user_id)
-    password = os.getenv("EMAIL_PASSWORD")
-    sender_email = os.getenv("EMAIL_ADDRESS")
+    password = os.environ.get("EMAIL_PASSWORD")
+    sender_email = os.environ.get("EMAIL_ADDRESS")
     yag = yagmail.SMTP(sender_email, password)
     contents = [f'Hi there, {user_name}! Here is the 5-digit code to reset your password: {code} :)',
                 'If you have not requested to reset your password :( oh no']
