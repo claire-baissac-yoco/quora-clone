@@ -1,29 +1,4 @@
-import psycopg2
-import os
-# from dotenv import load_dotenv
 from utils import encrypt_password, user_password_is_valid, validate_user_password
-
-
-def connect_db():
-    # load_dotenv()
-    DATABASE = os.environ.get('DATABASE')
-    USER = os.environ.get('USER')
-    PASSWORD = os.environ.get('PASSWORD')
-    HOST = os.environ.get('HOST')
-    DB_PORT = os.environ.get('DB_PORT')
-
-    conn = psycopg2.connect(database=DATABASE, user=USER,
-                            password=PASSWORD, host=HOST, port=DB_PORT)
-
-    cursor = conn.cursor()
-
-    # # Executing an MYSQL function using the execute() method
-    # cursor.execute("select version()")
-
-    # # Fetch a single row using fetchone() method.
-    # data = cursor.fetchone()
-    # print("Connection established to: ", data)
-    return conn, cursor
 
 
 def insert_user(conn, cursor, first_name, last_name, email, password):
@@ -44,9 +19,7 @@ def validate_user_login(conn, cursor, email, password):
     try:
         cursor.execute(query, (email,))
         result = cursor.fetchone()
-        print(result)
         id, first_name, last_name, hashed_password = result
-        print(hashed_password)
         return validate_user_password(bytes(hashed_password), password), {"first_name": first_name, "last_name": last_name, "id": id}
     except Exception as e:
         print("Failed to login user")
@@ -54,14 +27,12 @@ def validate_user_login(conn, cursor, email, password):
 
 
 def validate_user_change_password(conn, cursor, email, old_password, new_password):
-    print("VALIDATE USER CHANGE PASSWORD")
     query = 'SELECT "email", "password" FROM public.\"Users\" WHERE email = %s;'
     query_change_password = 'UPDATE public.\"Users\" SET password = %s WHERE email = %s;'
     try:
         cursor.execute(query, (email,))
         result = cursor.fetchone()
-        ret_email, hashed_password = result
-        print(ret_email, bytes(hashed_password))
+        _, hashed_password = result
         if validate_user_password(bytes(hashed_password), old_password) and user_password_is_valid(new_password) and not old_password == new_password:
             cursor.execute(query_change_password,
                            (encrypt_password(new_password), email))

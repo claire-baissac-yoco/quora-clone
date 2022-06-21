@@ -1,4 +1,3 @@
-from fastapi import Query
 from pydantic import BaseModel
 
 
@@ -12,6 +11,3 @@ class CreateUser(BaseModel):
 class User(BaseModel):
     email: str
     password: str
-
-# class ChangePassword(BaseModel):
-#     password: str

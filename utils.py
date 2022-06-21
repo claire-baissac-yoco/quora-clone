@@ -1,14 +1,11 @@
 import bcrypt
 import jwt
 from cryptography.hazmat.primitives import serialization
-# from dotenv import load_dotenv
 import os
 import re
 import redis
 import yagmail
 import random
-
-# load_dotenv()
 
 
 def encrypt_password(password: str):
@@ -19,30 +16,23 @@ def encrypt_password(password: str):
 
 
 def generate_token(id, first_name, last_name, email):
-    print(f"generate token: {id}, {first_name}, {last_name}, {email}")
-    print(f"os environ get: {os.environ.get('KEY_PASSWORD')}")
     payload_data = {
         "id": id,
         "name": f"{first_name} {last_name}",
         "email": email
     }
-    # open('.ssh/id_rsa', 'r').read()
     private_key = os.environ.get("PRIVATE_KEY")
     password = os.environ.get("KEY_PASSWORD")
-    print(password)
     key = serialization.load_ssh_private_key(
         private_key.encode(), password=password.encode('utf-8'))
     token = jwt.encode(payload=payload_data, key=key, algorithm='RS256')
-    print(token)
     return token
 
 
 def decode_token(token):
-    # open('.ssh/id_rsa.pub', 'r').read()
     public_key = os.environ.get("PUBLIC_KEY")
     key = serialization.load_ssh_public_key(public_key.encode())
     payload = jwt.decode(jwt=token, key=key, algorithms=['RS256'])
-    print(payload)
     return payload
 
 
@@ -60,8 +50,6 @@ def validate_user_info(email, password):
 
 
 def validate_user_password(actual_password_hashed, provided_password: str):
-    print("actual password hashed vs provided password")
-    print(actual_password_hashed, provided_password)
     return bcrypt.checkpw(provided_password.encode('utf-8'), actual_password_hashed)
 
 
@@ -73,11 +61,9 @@ def gen_redis_code(user_id):
         host=redis_host, port=redis_port, password=redis_password)
     nums = random.sample(range(0, 10), 5)
     code = "".join([str(num) for num in nums])
-    print(code)
     key_name = f"password-reset-token-{user_id}"
     r.set(name=key_name, value=code)
     r.expire(key_name, 10*60)
-    print(r.get(key_name).decode('utf-8'))
     return code
 
 
@@ -88,5 +74,4 @@ def send_reset_password_email(user_email, user_name, user_id):
     yag = yagmail.SMTP(sender_email, password)
     contents = [f'Hi there, {user_name}! Here is the 5-digit code to reset your password: {code} :)',
                 'If you have not requested to reset your password :( oh no']
-    print(contents)
     yag.send(to=user_email, subject='Reset your password', contents=contents)
