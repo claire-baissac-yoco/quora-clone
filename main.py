@@ -57,6 +57,7 @@ def create_user(user: CreateUser):
                               user.last_name, user.email, user.password)
         token = utils.generate_token(
             user_id, user.first_name, user.last_name, user.email)
+        print(f"token: {token}")
         return {'success': True, 'message': 'success', 'data': token}
     except:
         return JSONResponse(status_code=404, content={

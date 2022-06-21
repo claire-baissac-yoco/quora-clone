@@ -19,6 +19,7 @@ def encrypt_password(password: str):
 
 
 def generate_token(id, first_name, last_name, email):
+    print(f"generate token: {id}, {first_name}, {last_name}, {email}")
     payload_data = {
         "id": id,
         "name": f"{first_name} {last_name}",
