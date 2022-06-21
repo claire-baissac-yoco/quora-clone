@@ -67,13 +67,17 @@ def create_user(user: CreateUser):
 @app.post('/auth/login')
 def login_user(user: User):
     print(user)
-    is_validated, user_info = validate_user_login(
-        conn, cursor, user.email, user.password)
-    if is_validated:
-        token = utils.generate_token(
-            user_info["id"], user_info["first_name"], user_info["last_name"], user.email)
-        return {'success': True, 'message': 'success', 'data': token}
-    else:
+    try:
+        is_validated, user_info = validate_user_login(
+            conn, cursor, user.email, user.password)
+        if is_validated:
+            token = utils.generate_token(
+                user_info["id"], user_info["first_name"], user_info["last_name"], user.email)
+            return {'success': True, 'message': 'success', 'data': token}
+        else:
+            return JSONResponse(status_code=400, content={
+                "success": False, "error": "Incorrect email or password"})
+    except:
         return JSONResponse(status_code=400, content={
             "success": False, "error": "Incorrect email or password"})
 
