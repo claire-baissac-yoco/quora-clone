@@ -66,7 +66,8 @@ def validate_user_password(actual_password_hashed, provided_password: str):
 
 
 def gen_redis_code(user_id):
-    r = redis.Redis()
+    r = redis.Redis(
+        host="redis-14701.c258.us-east-1-4.ec2.cloud.redislabs.com:14701s")
     nums = random.sample(range(0, 10), 5)
     code = "".join([str(num) for num in nums])
     print(code)
