@@ -45,8 +45,6 @@ def create_user(user: CreateUser):
         return JSONResponse(status_code=400, content={
             "success": False, "error": "Invalid user input"})
     try:
-
-        # payload = utils.decode_token(token)
         user_id = insert_user(conn, cursor, user.first_name,
                               user.last_name, user.email, user.password)
         token = utils.generate_token(

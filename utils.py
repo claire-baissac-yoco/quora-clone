@@ -8,14 +8,14 @@ import yagmail
 import random
 
 
-def encrypt_password(password: str):
+def encrypt_password(password: str) -> bytes:
     byte_password = password.encode('utf-8')
     salt = bcrypt.gensalt()
     hash = bcrypt.hashpw(byte_password, salt)
     return hash
 
 
-def generate_token(id, first_name, last_name, email):
+def generate_token(id: str, first_name: str, last_name: str, email: str) -> str:
     payload_data = {
         "id": id,
         "name": f"{first_name} {last_name}",
@@ -29,23 +29,23 @@ def generate_token(id, first_name, last_name, email):
     return token
 
 
-def decode_token(token):
+def decode_token(token: str):
     public_key = os.environ.get("PUBLIC_KEY")
     key = serialization.load_ssh_public_key(public_key.encode())
     payload = jwt.decode(jwt=token, key=key, algorithms=['RS256'])
     return payload
 
 
-def user_password_is_valid(password):
+def user_password_is_valid(password: str) -> bool:
     return len(password) >= 8
 
 
-def user_email_is_valid(email):
+def user_email_is_valid(email: str) -> bool:
     regex = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
     return re.search(regex, email)
 
 
-def validate_user_info(email, password):
+def validate_user_info(email: str, password: str) -> bool:
     return user_email_is_valid(email) and user_password_is_valid(password)
 
 
