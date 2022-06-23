@@ -78,6 +78,7 @@ def gen_redis_code(r: Redis, user_id):
 def validate_redis_code(r: Redis, user_id, supplied_code):
     key_name = f"password-reset-token-{user_id}"
     redis_code = r.get(key_name)
+    print(f"user supplied code: {supplied_code}, stored code: {redis_code}")
     return supplied_code == redis_code
 
 
