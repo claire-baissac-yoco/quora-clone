@@ -69,7 +69,7 @@ def user_reset_password(conn, cursor, email: str, new_password: str) -> bool:
 
 
 def user_delete_account(conn, cursor, email: str) -> bool:
-    query = 'DELETE * FROM public.\"Users\" WHERE email = %s;'
+    query = 'DELETE FROM public.\"Users\" WHERE email = %s;'
     try:
         cursor.execute(query, (email,))
         conn.commit()

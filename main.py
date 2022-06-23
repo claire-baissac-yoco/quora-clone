@@ -128,7 +128,8 @@ def delete_account_user(req: Request):
         return JSONResponse(status_code=401, content={"success": False, "error": "Invalid authorization token"})
     if authorized:
         try:
-            user_delete_account(conn, cursor, email)
+            if user_delete_account(conn, cursor, email):
+                return {'success': True, 'message': 'Password reset successfully'}
         except:
             return JSONResponse(status_code=401, content={"success": False, "error": "Failed to delete account"})
 
