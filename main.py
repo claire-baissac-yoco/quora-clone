@@ -114,11 +114,14 @@ def reset_password_user(resetPassword: ResetPassword):
 def reset_password_confirm_user(confirmResetPassword: ConfirmResetPassword):
     _, user_id = fetch_user_data_from_email(
         conn, cursor, email=confirmResetPassword.email)
-    if utils.validate_redis_code(r, user_id, confirmResetPassword.code):
-        user_reset_password(
-            conn, cursor, confirmResetPassword.email, confirmResetPassword.password)
-        return {'success': True, 'message': 'Password reset successfully'}
-    else:
+    try:
+        if utils.validate_redis_code(r, user_id, confirmResetPassword.code):
+            user_reset_password(
+                conn, cursor, confirmResetPassword.email, confirmResetPassword.password)
+            return {'success': True, 'message': 'Password reset successfully'}
+        else:
+            return JSONResponse(status_code=401, content={"success": False, "error": "Failed to reset password"})
+    except:
         return JSONResponse(status_code=401, content={"success": False, "error": "Failed to reset password"})
 
 

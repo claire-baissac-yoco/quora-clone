@@ -61,7 +61,7 @@ def fetch_user_data_from_email(conn, cursor, email: str):
 def user_reset_password(conn, cursor, email: str, new_password: str) -> None:
     query_change_password = 'UPDATE public.\"Users\" SET password = %s WHERE email = %s;'
     try:
-        cursor.execute(query_change_password, (email,))
+        cursor.execute(query_change_password, (new_password, email,))
         conn.commit()
     except Exception as e:
         print("Failed to reset password")
