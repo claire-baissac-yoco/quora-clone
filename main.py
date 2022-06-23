@@ -3,13 +3,14 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 import os
 import uvicorn
-from models import CreateUser, User
-from database import insert_user, validate_user_change_password, validate_user_login
-from db_script import connect_db
+from models import ConfirmResetPassword, CreateUser, ResetPassword, User
+from database import fetch_user_data_from_email, insert_user, user_reset_password, validate_user_change_password, validate_user_login
+from db_script import connect_db, connect_redis
 import utils
 
 PORT = int(os.environ.get('PORT'))
 conn, cursor = connect_db()
+r = connect_redis()
 
 
 class UnicornException(Exception):
@@ -95,15 +96,28 @@ async def change_password_user(req: Request):
 
 
 @app.post('/auth/password-reset')
-def forgot_password_user(req: Request):
-    if 'Authorization' not in req.headers:
-        return JSONResponse(status_code=401, content={"success": False, "error": "Invalid header"})
-    authorized, email, user_id, user_name = verify_jwt_token(req)
-    if authorized:
-        utils.send_reset_password_email(email, user_name, user_id)
-        return {'success': True, 'message': 'A 5-digit code will be sent to your email inbox to reset your password.'}
+def reset_password_user(resetPassword: ResetPassword):
+    # if 'Authorization' not in req.headers:
+    #     return JSONResponse(status_code=401, content={"success": False, "error": "Invalid header"})
+    # authorized, email, user_id, user_name = verify_jwt_token(req)
+    user_name, user_id = fetch_user_data_from_email(email=resetPassword.email)
+    # if authorized:
+    utils.send_reset_password_email(r, resetPassword.email, user_name, user_id)
+    return {'success': True, 'message': 'A 5-digit code will be sent to your email inbox to reset your password.'}
+    # else:
+    #     return JSONResponse(status_code=401, content={"success": False, "error": "Invalid authorization token"})
+
+
+@app.post('/auth/password-reset/confirm')
+def reset_password_confirm_user(confirmResetPassword: ConfirmResetPassword):
+    user_name, user_id = fetch_user_data_from_email(
+        email=confirmResetPassword.email)
+    if utils.validate_redis_code(r, user_id, confirmResetPassword.code):
+        user_reset_password(
+            conn, cursor, confirmResetPassword.email, confirmResetPassword.password)
+        return {'success': True, 'message': 'Password reset successfully'}
     else:
-        return JSONResponse(status_code=401, content={"success": False, "error": "Invalid authorization token"})
+        return JSONResponse(status_code=401, content={"success": False, "error": "Failed to reset password"})
 
 
 @app.exception_handler(404)

@@ -11,3 +11,13 @@ class CreateUser(BaseModel):
 class User(BaseModel):
     email: str
     password: str
+
+
+class ResetPassword(BaseModel):
+    email: str
+
+
+class ConfirmResetPassword(BaseModel):
+    email: str
+    password: str
+    code: str
