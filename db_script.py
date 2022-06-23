@@ -29,3 +29,4 @@ def connect_redis():
     redis_password = os.environ.get("REDIS_PASSWORD")
     r = redis.Redis(
         host=redis_host, port=redis_port, password=redis_password)
+    return r
