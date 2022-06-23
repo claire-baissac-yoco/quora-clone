@@ -51,6 +51,7 @@ def fetch_user_data_from_email(conn, cursor, email: str) -> dict:
         cursor.execute(query, (email,))
         result = cursor.fetchone()
         id, first_name, last_name = result
+        print(f" fetch user data from email: {id}, {first_name}, {last_name}")
         return {"name": f"{first_name} {last_name}", "id": id}
     except Exception as e:
         print("Failed to fetch user")

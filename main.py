@@ -102,6 +102,7 @@ def reset_password_user(resetPassword: ResetPassword):
     # authorized, email, user_id, user_name = verify_jwt_token(req)
     user_name, user_id = fetch_user_data_from_email(
         conn, cursor, email=resetPassword.email)
+    print(user_name, user_id)
     # if authorized:
     utils.send_reset_password_email(r, resetPassword.email, user_name, user_id)
     return {'success': True, 'message': 'A 5-digit code will be sent to your email inbox to reset your password.'}
