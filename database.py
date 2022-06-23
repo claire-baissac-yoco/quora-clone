@@ -1,8 +1,8 @@
 from utils import encrypt_password, user_password_is_valid, validate_user_password
-# from psycopg2 import connection, cursor
+from psycopg2 import connection, cursor
 
 
-def insert_user(conn, cursor, first_name: str, last_name: str, email: str, password: str) -> str:
+def insert_user(conn: connection, cursor: cursor, first_name: str, last_name: str, email: str, password: str) -> str:
     query = 'INSERT INTO public.\"Users\" ("firstName", "lastName", "email", "password") VALUES (%s, %s, %s, %s) RETURNING id;'
     try:
         cursor.execute(query, (first_name, last_name,
@@ -51,7 +51,6 @@ def fetch_user_data_from_email(conn, cursor, email: str):
         cursor.execute(query, (email,))
         result = cursor.fetchone()
         id, first_name, last_name = result
-        print(f" fetch user data from email: {id}, {first_name}, {last_name}")
         return f"{first_name} {last_name}", id
     except Exception as e:
         print("Failed to fetch user")
