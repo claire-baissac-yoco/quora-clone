@@ -4,7 +4,7 @@ from fastapi.responses import JSONResponse
 import os
 import uvicorn
 from models import ConfirmResetPassword, CreateUser, ResetPassword, User
-from database import fetch_user_data_from_email, insert_user, user_reset_password, validate_user_change_password, validate_user_login
+from database import fetch_user_data_from_email, insert_user, user_delete_account, user_reset_password, validate_user_change_password, validate_user_login
 from db_script import connect_db, connect_redis
 import utils
 
@@ -115,6 +115,22 @@ def reset_password_confirm_user(confirmResetPassword: ConfirmResetPassword):
         return JSONResponse(status_code=401, content={"success": False, "error": "Failed to reset password"})
     except:
         return JSONResponse(status_code=401, content={"success": False, "error": "Failed to reset password"})
+
+
+@app.post('/user/delete')
+def delete_account_user(req: Request):
+    if 'Authorization' not in req.headers:
+        return JSONResponse(status_code=401, content={"success": False, "error": "Invalid header"})
+    verify_token = verify_jwt_token(req)
+    if verify_token:
+        authorized, email, _, _ = verify_token
+    else:
+        return JSONResponse(status_code=401, content={"success": False, "error": "Invalid authorization token"})
+    if authorized:
+        try:
+            user_delete_account(conn, cursor, email)
+        except:
+            return JSONResponse(status_code=401, content={"success": False, "error": "Failed to delete account"})
 
 
 @app.exception_handler(404)

@@ -1,8 +1,7 @@
 from utils import encrypt_password, user_password_is_valid, validate_user_password
-from psycopg2 import cursor
 
 
-def insert_user(conn, cursor: cursor, first_name: str, last_name: str, email: str, password: str) -> str:
+def insert_user(conn, cursor, first_name: str, last_name: str, email: str, password: str) -> str:
     query = 'INSERT INTO public.\"Users\" ("firstName", "lastName", "email", "password") VALUES (%s, %s, %s, %s) RETURNING id;'
     try:
         cursor.execute(query, (first_name, last_name,
