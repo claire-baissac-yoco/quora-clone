@@ -1,8 +1,8 @@
 from utils import encrypt_password, user_password_is_valid, validate_user_password
-from psycopg2 import connection, cursor
+# from psycopg2 import connection, cursor
 
 
-def insert_user(conn: connection, cursor: cursor, first_name: str, last_name: str, email: str, password: str) -> str:
+def insert_user(conn, cursor, first_name: str, last_name: str, email: str, password: str) -> str:
     query = 'INSERT INTO public.\"Users\" ("firstName", "lastName", "email", "password") VALUES (%s, %s, %s, %s) RETURNING id;'
     try:
         cursor.execute(query, (first_name, last_name,
@@ -15,7 +15,7 @@ def insert_user(conn: connection, cursor: cursor, first_name: str, last_name: st
         print(e)
 
 
-def validate_user_login(conn: connection, cursor: cursor, email: str, password: str) -> bool:
+def validate_user_login(conn, cursor, email: str, password: str) -> bool:
     query = 'SELECT "id", "firstName", "lastName", "password" FROM public.\"Users\" WHERE email = %s;'
     try:
         cursor.execute(query, (email,))
@@ -27,7 +27,7 @@ def validate_user_login(conn: connection, cursor: cursor, email: str, password: 
         print(e)
 
 
-def validate_user_change_password(conn: connection, cursor: cursor, email: str, old_password: str, new_password: str) -> bool:
+def validate_user_change_password(conn, cursor, email: str, old_password: str, new_password: str) -> bool:
     query = 'SELECT "email", "password" FROM public.\"Users\" WHERE email = %s;'
     query_change_password = 'UPDATE public.\"Users\" SET password = %s WHERE email = %s;'
     try:
@@ -45,7 +45,7 @@ def validate_user_change_password(conn: connection, cursor: cursor, email: str, 
         print(e)
 
 
-def fetch_user_data_from_email(conn: connection, cursor: cursor, email: str) -> dict:
+def fetch_user_data_from_email(conn, cursor, email: str) -> dict:
     query = 'SELECT "id", "firstName", "lastName" FROM public.\"Users\" WHERE email = %s;'
     try:
         cursor.execute(query, (email,))
@@ -57,7 +57,7 @@ def fetch_user_data_from_email(conn: connection, cursor: cursor, email: str) -> 
         print(e)
 
 
-def user_reset_password(conn: connection, cursor: cursor, email: str, new_password: str) -> None:
+def user_reset_password(conn, cursor, email: str, new_password: str) -> None:
     query_change_password = 'UPDATE public.\"Users\" SET password = %s WHERE email = %s;'
     try:
         cursor.execute(query_change_password, (email,))
