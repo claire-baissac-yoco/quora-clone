@@ -1,8 +1,8 @@
 from utils import encrypt_password, user_password_is_valid, validate_user_password
-from psycopg2 import connection, cursor
+from psycopg2 import cursor
 
 
-def insert_user(conn: connection, cursor: cursor, first_name: str, last_name: str, email: str, password: str) -> str:
+def insert_user(conn, cursor: cursor, first_name: str, last_name: str, email: str, password: str) -> str:
     query = 'INSERT INTO public.\"Users\" ("firstName", "lastName", "email", "password") VALUES (%s, %s, %s, %s) RETURNING id;'
     try:
         cursor.execute(query, (first_name, last_name,
@@ -66,6 +66,17 @@ def user_reset_password(conn, cursor, email: str, new_password: str) -> bool:
         return True
     except Exception as e:
         print("Failed to reset password")
+        print(e)
+
+
+def user_delete_account(conn, cursor, email: str) -> bool:
+    query = 'DELETE * FROM public.\"Users\" WHERE email = %s;'
+    try:
+        cursor.execute(query, (email,))
+        conn.commit()
+        return True
+    except Exception as e:
+        print("Failed to delete account")
         print(e)
 
 
