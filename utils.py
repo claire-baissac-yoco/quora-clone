@@ -14,6 +14,7 @@ def encrypt_password(password: str) -> bytes:
     byte_password = password.encode('utf-8')
     salt = bcrypt.gensalt()
     hash = bcrypt.hashpw(byte_password, salt)
+    print(f"encrypted password: {hash}")
     return hash
 
 
