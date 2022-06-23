@@ -81,6 +81,9 @@ def validate_redis_code(r: Redis, user_id, supplied_code):
     print(f"user id: {user_id}")
     key_name = f"password-reset-token-{user_id}"
     redis_code = r.get(key_name)
+    if not redis_code:
+        print("No code exists")
+        return False
     print(
         f"user supplied code: {supplied_code}, stored code: [{key_name}: {redis_code}]")
     return supplied_code == redis_code.decode('utf-8')
