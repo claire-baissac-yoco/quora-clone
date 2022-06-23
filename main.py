@@ -111,8 +111,8 @@ def reset_password_user(resetPassword: ResetPassword):
 
 @app.post('/auth/password-reset/confirm')
 def reset_password_confirm_user(confirmResetPassword: ConfirmResetPassword):
-    user_name, user_id = fetch_user_data_from_email(
-        email=confirmResetPassword.email)
+    _, user_id = fetch_user_data_from_email(
+        conn, cursor, email=confirmResetPassword.email)
     if utils.validate_redis_code(r, user_id, confirmResetPassword.code):
         user_reset_password(
             conn, cursor, confirmResetPassword.email, confirmResetPassword.password)
