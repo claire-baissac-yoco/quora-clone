@@ -70,6 +70,7 @@ def gen_redis_code(r: Redis, user_id):
     nums = random.sample(range(0, 10), 5)
     code = "".join([str(num) for num in nums])
     key_name = f"password-reset-token-{user_id}"
+    print(f"storing key -> [{key_name}: {code}]")
     r.set(name=key_name, value=code)
     r.expire(key_name, 10*60)
     return code
@@ -78,7 +79,8 @@ def gen_redis_code(r: Redis, user_id):
 def validate_redis_code(r: Redis, user_id, supplied_code):
     key_name = f"password-reset-token-{user_id}"
     redis_code = r.get(key_name)
-    print(f"user supplied code: {supplied_code}, stored code: {redis_code}")
+    print(
+        f"user supplied code: {supplied_code}, stored code: [{key_name}: {redis_code}]")
     return supplied_code == redis_code
 
 
