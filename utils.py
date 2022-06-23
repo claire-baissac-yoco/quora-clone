@@ -83,7 +83,7 @@ def validate_redis_code(r: Redis, user_id, supplied_code):
     redis_code = r.get(key_name)
     print(
         f"user supplied code: {supplied_code}, stored code: [{key_name}: {redis_code}]")
-    return supplied_code == redis_code
+    return supplied_code == redis_code.decode('utf-8')
 
 
 def send_reset_password_email(r: Redis, user_email, user_name, user_id):

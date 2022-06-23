@@ -45,14 +45,14 @@ def validate_user_change_password(conn, cursor, email: str, old_password: str, n
         print(e)
 
 
-def fetch_user_data_from_email(conn, cursor, email: str) -> dict:
+def fetch_user_data_from_email(conn, cursor, email: str):
     query = 'SELECT "id", "firstName", "lastName" FROM public.\"Users\" WHERE email = %s;'
     try:
         cursor.execute(query, (email,))
         result = cursor.fetchone()
         id, first_name, last_name = result
         print(f" fetch user data from email: {id}, {first_name}, {last_name}")
-        return {"name": f"{first_name} {last_name}", "id": id}
+        return f"{first_name} {last_name}", id
     except Exception as e:
         print("Failed to fetch user")
         print(e)
