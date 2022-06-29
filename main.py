@@ -34,6 +34,17 @@ def verify_jwt_token(req: Request):
         return False
 
 
+def verify_header(req: Request):
+    if 'Authorization' not in req.headers:
+        return JSONResponse(status_code=401, content={"success": False, "error": "Invalid header"})
+    verify_token = verify_jwt_token(req)
+    if verify_token:
+        authorized, email, _, _ = verify_token
+        return authorized, email
+    else:
+        return JSONResponse(status_code=401, content={"success": False, "error": "Invalid authorization token"})
+
+
 @app.get('/')
 def get_root():
     return {'success': True, 'message': 'success'}
@@ -141,13 +152,16 @@ def delete_account_user(req: Request):
 @app.get('/search/accounts')
 def find_account(email: str, req: Request):
     print(f"find account: {email}")
-    if 'Authorization' not in req.headers:
-        return JSONResponse(status_code=401, content={"success": False, "error": "Invalid header"})
-    verify_token = verify_jwt_token(req)
-    if verify_token:
-        authorized, user_email, _, _ = verify_token
-    else:
-        return JSONResponse(status_code=401, content={"success": False, "error": "Invalid authorization token"})
+    # if 'Authorization' not in req.headers:
+    #     return JSONResponse(status_code=401, content={"success": False, "error": "Invalid header"})
+    # verify_token = verify_jwt_token(req)
+    # if verify_token:
+    #     authorized, user_email, _, _ = verify_token
+    # else:
+    #     return JSONResponse(status_code=401, content={"success": False, "error": "Invalid authorization token"})
+    verif_header = verify_header(req)
+    if isinstance(verif_header, JSONResponse):
+        return verif_header
     try:
         user_name, user_id = fetch_user_data_from_email(
             conn, cursor, email=email)
@@ -155,6 +169,18 @@ def find_account(email: str, req: Request):
         return {'success': True, 'message': 'Successfully found user', 'data': {user_name, user_id}}
     except:
         return JSONResponse(status_code=401, content={"success": False, "error": "Failed to find user"})
+
+
+@app.post('/accounts/follow')
+def follow_account(id: str, req: Request):
+    print(f"follow account: {id}")
+    if 'Authorization' not in req.headers:
+        return JSONResponse(status_code=401, content={"success": False, "error": "Invalid header"})
+    verify_token = verify_jwt_token(req)
+    if verify_token:
+        authorized, user_email, _, _ = verify_token
+    else:
+        return JSONResponse(status_code=401, content={"success": False, "error": "Invalid authorization token"})
 
 
 @app.exception_handler(404)
