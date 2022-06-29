@@ -8,7 +8,11 @@ from database import fetch_user_data_from_email, insert_user, user_delete_accoun
 from db_script import connect_db, connect_redis
 import utils
 
-PORT = int(os.environ.get('PORT'))
+PORT = os.environ.get('PORT')
+if PORT:
+    PORT = int(PORT)
+else:
+    PORT = 8000
 conn, cursor = connect_db()
 r = connect_redis()
 
@@ -129,9 +133,28 @@ def delete_account_user(req: Request):
     if authorized:
         try:
             if user_delete_account(conn, cursor, email):
-                return {'success': True, 'message': 'Password reset successfully'}
+                return {'success': True, 'message': 'Account deleted successfully'}
         except:
             return JSONResponse(status_code=401, content={"success": False, "error": "Failed to delete account"})
+
+
+@app.get('/search/accounts')
+def find_account(email: str, req: Request):
+    print(f"find account: {email}")
+    if 'Authorization' not in req.headers:
+        return JSONResponse(status_code=401, content={"success": False, "error": "Invalid header"})
+    verify_token = verify_jwt_token(req)
+    if verify_token:
+        authorized, user_email, _, _ = verify_token
+    else:
+        return JSONResponse(status_code=401, content={"success": False, "error": "Invalid authorization token"})
+    try:
+        user_name, user_id = fetch_user_data_from_email(
+            conn, cursor, email=email)
+        print(user_name, user_id)
+        return {'success': True, 'message': 'Successfully found user', 'data': {user_name, user_id}}
+    except:
+        return JSONResponse(status_code=401, content={"success": False, "error": "Failed to find user"})
 
 
 @app.exception_handler(404)
