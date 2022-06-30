@@ -4,7 +4,7 @@ from fastapi.responses import JSONResponse
 import os
 import uvicorn
 from models import ConfirmResetPassword, CreateUser, ResetPassword, User
-from database import fetch_user_data_from_email, insert_user, user_delete_account, user_follow_account, user_get_followed_accounts, user_reset_password, validate_user_change_password, validate_user_login
+from database import fetch_user_data_from_email, insert_user, user_delete_account, user_follow_account, user_get_account_followers, user_get_followed_accounts, user_reset_password, validate_user_change_password, validate_user_login
 from db_script import connect_db, connect_redis
 import utils
 
@@ -194,10 +194,26 @@ def get_followed_accounts(req: Request):
         try:
             followed_accounts = user_get_followed_accounts(
                 conn, cursor, user_id)
-            return {'success': True, 'message': 'Successfully fetched followed accounts', 'data': followed_accounts}
+            return {'success': True, 'message': 'Successfully retrieved followed accounts', 'data': followed_accounts}
         except:
             return JSONResponse(status_code=401, content={"success": False, "error": "Failed to fetch followed accounts"})
     return JSONResponse(status_code=401, content={"success": False, "error": "Failed to fetch followed accounts"})
+
+
+@app.post('/accounts/followers')
+def get_account_followers(req: Request):
+    verif_header = verify_header(req)
+    if isinstance(verif_header, JSONResponse):
+        return verif_header
+    authorized, _, user_id, _ = verif_header
+    if authorized:
+        try:
+            account_followers = user_get_account_followers(
+                conn, cursor, user_id)
+            return {'success': True, 'message': 'Successfully retrieved following accounts', 'data': account_followers}
+        except:
+            return JSONResponse(status_code=401, content={"success": False, "error": "Failed to fetch account followers"})
+    return JSONResponse(status_code=401, content={"success": False, "error": "Failed to fetch account followers"})
 
 
 @app.exception_handler(404)
