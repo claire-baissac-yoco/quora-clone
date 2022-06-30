@@ -4,7 +4,7 @@ from fastapi.responses import JSONResponse
 import os
 import uvicorn
 from models import ConfirmResetPassword, CreateUser, ResetPassword, User
-from database import fetch_user_data_from_email, insert_user, user_delete_account, user_reset_password, validate_user_change_password, validate_user_login
+from database import fetch_user_data_from_email, insert_user, user_delete_account, user_follow_account, user_reset_password, validate_user_change_password, validate_user_login
 from db_script import connect_db, connect_redis
 import utils
 
@@ -152,13 +152,6 @@ def delete_account_user(req: Request):
 @app.get('/search/accounts')
 def find_account(email: str, req: Request):
     print(f"find account: {email}")
-    # if 'Authorization' not in req.headers:
-    #     return JSONResponse(status_code=401, content={"success": False, "error": "Invalid header"})
-    # verify_token = verify_jwt_token(req)
-    # if verify_token:
-    #     authorized, user_email, _, _ = verify_token
-    # else:
-    #     return JSONResponse(status_code=401, content={"success": False, "error": "Invalid authorization token"})
     verif_header = verify_header(req)
     if isinstance(verif_header, JSONResponse):
         return verif_header
@@ -172,13 +165,20 @@ def find_account(email: str, req: Request):
 
 
 @app.post('/accounts/follow')
-def follow_account(id: str, req: Request):
+def follow_account(following_id: str, req: Request):
     print(f"follow account: {id}")
     if 'Authorization' not in req.headers:
         return JSONResponse(status_code=401, content={"success": False, "error": "Invalid header"})
     verify_token = verify_jwt_token(req)
     if verify_token:
-        authorized, user_email, _, _ = verify_token
+        authorized, user_email, user_id, _ = verify_token
+    else:
+        return JSONResponse(status_code=401, content={"success": False, "error": "Invalid authorization token"})
+    if authorized:
+        try:
+            user_follow_account(conn, cursor, user_id, following_id)
+        except:
+            return JSONResponse(status_code=401, content={"success": False, "error": "Failed to follow user"})
     else:
         return JSONResponse(status_code=401, content={"success": False, "error": "Invalid authorization token"})
 

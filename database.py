@@ -104,5 +104,17 @@ def user_delete_account(conn, cursor, email: str) -> bool:
         print(e)
 
 
+def user_follow_account(conn, cursor, user_id: str, following_id: str) -> bool:
+    print(f"user {user_id} wants to follow user {following_id}")
+    query = 'INSERT INTO public.\"Followers\" ("user_id", "following_id") VALUES (%s, %s);'
+    try:
+        cursor.execute(query, (user_id, following_id))
+        conn.commit()
+        return True
+    except Exception as e:
+        print("Failed to insert into table")
+        print(e)
+
+
 def close_db(conn):
     conn.close()
