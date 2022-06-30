@@ -121,7 +121,7 @@ def user_get_followed_accounts(conn, cursor, user_id: str):
     query = 'SELECT "firstName", "lastName", public."Users".id FROM public."Users" INNER JOIN public.\"Followers\" ON public.\"Users\".id = public.\"Followers\".following_id WHERE public.\"Followers\".id = %s;'
     try:
         cursor.execute(query, (user_id,))
-        result = cursor.fetchone()
+        result = cursor.fetchall()
         print(result)
         return True
     except Exception as e:
