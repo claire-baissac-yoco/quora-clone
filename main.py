@@ -229,7 +229,7 @@ def create_question(question: Question, req: Request):
 
 
 @app.get('/questions')
-def fetch_questions(user_id: str, req: Request):
+def fetch_questions(req: Request):
     verif_header = verify_header(req)
     if isinstance(verif_header, JSONResponse):
         return verif_header
