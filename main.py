@@ -4,7 +4,7 @@ from fastapi.responses import JSONResponse
 import os
 import uvicorn
 from models import ConfirmResetPassword, CreateUser, ResetPassword, User
-from database import fetch_user_data_from_email, insert_user, user_delete_account, user_follow_account, user_reset_password, validate_user_change_password, validate_user_login
+from database import fetch_user_data_from_email, insert_user, user_delete_account, user_follow_account, user_get_followed_accounts, user_reset_password, validate_user_change_password, validate_user_login
 from db_script import connect_db, connect_redis
 import utils
 
@@ -39,8 +39,8 @@ def verify_header(req: Request):
         return JSONResponse(status_code=401, content={"success": False, "error": "Invalid header"})
     verify_token = verify_jwt_token(req)
     if verify_token:
-        authorized, email, _, _ = verify_token
-        return authorized, email
+        authorized, email, user_id, user_name = verify_token
+        return authorized, email, user_id, user_name
     else:
         return JSONResponse(status_code=401, content={"success": False, "error": "Invalid authorization token"})
 
@@ -156,7 +156,7 @@ def find_account(email: str, req: Request):
     if isinstance(verif_header, JSONResponse):
         return verif_header
     try:
-        user_name, user_id = fetch_user_data_from_email(
+        user_name, user_id, _, _ = fetch_user_data_from_email(
             conn, cursor, email=email)
         print(user_name, user_id)
         return {'success': True, 'message': 'Successfully found user', 'data': {user_name, user_id}}
@@ -172,7 +172,7 @@ def follow_account(following_id: str, req: Request):
     verify_token = verify_jwt_token(req)
     print(verify_token)
     if verify_token:
-        authorized, user_email, user_id, _ = verify_token
+        authorized, _, user_id, _ = verify_token
     else:
         return JSONResponse(status_code=401, content={"success": False, "error": "Invalid authorization token"})
     if authorized:
@@ -182,6 +182,22 @@ def follow_account(following_id: str, req: Request):
         except:
             return JSONResponse(status_code=401, content={"success": False, "error": "Failed to follow user"})
     return JSONResponse(status_code=401, content={"success": False, "error": "Invalid authorization token"})
+
+
+@app.post('/accounts/following')
+def get_followed_accounts(req: Request):
+    verif_header = verify_header(req)
+    if isinstance(verif_header, JSONResponse):
+        return verif_header
+    authorized, _, user_id, _ = verif_header
+    if authorized:
+        try:
+            followed_accounts = user_get_followed_accounts(
+                conn, cursor, user_id)
+            return {'success': True, 'message': 'Successfully followed user', 'data': followed_accounts}
+        except:
+            return JSONResponse(status_code=401, content={"success": False, "error": "Failed to fetch followed accounts"})
+    return JSONResponse(status_code=401, content={"success": False, "error": "Failed to fetch followed accounts"})
 
 
 @app.exception_handler(404)
