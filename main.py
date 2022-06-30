@@ -176,11 +176,11 @@ def follow_account(following_id: str, req: Request):
         return JSONResponse(status_code=401, content={"success": False, "error": "Invalid authorization token"})
     if authorized:
         try:
-            user_follow_account(conn, cursor, user_id, following_id)
+            if not user_id == following_id and user_follow_account(conn, cursor, user_id, following_id):
+                return {'success': True, 'message': 'Successfully followed user'}
         except:
             return JSONResponse(status_code=401, content={"success": False, "error": "Failed to follow user"})
-    else:
-        return JSONResponse(status_code=401, content={"success": False, "error": "Invalid authorization token"})
+    return JSONResponse(status_code=401, content={"success": False, "error": "Invalid authorization token"})
 
 
 @app.exception_handler(404)
