@@ -170,6 +170,7 @@ def follow_account(following_id: str, req: Request):
     if 'Authorization' not in req.headers:
         return JSONResponse(status_code=401, content={"success": False, "error": "Invalid header"})
     verify_token = verify_jwt_token(req)
+    print(verify_token)
     if verify_token:
         authorized, user_email, user_id, _ = verify_token
     else:
