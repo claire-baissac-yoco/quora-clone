@@ -123,7 +123,9 @@ def user_get_followed_accounts(conn, cursor, user_id: str):
         cursor.execute(query, (user_id,))
         result = cursor.fetchall()
         print(result)
-        return True
+        dict_result = [{'id': r[2], 'firstName': r[0],
+                        'lastName': r[1]} for r in result]
+        return dict_result
     except Exception as e:
         print("Failed to fetch accounts")
         print(e)
