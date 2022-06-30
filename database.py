@@ -158,7 +158,7 @@ def user_create_question(conn, cursor, user_id, title, description):
 
 
 def get_questions_for_user(conn, cursor, user_id):
-    query = 'SELECT "title", "description", "id" FROM public.Questions WHERE user_id = %s;'
+    query = 'SELECT "title", "description", "id" FROM public."Questions" WHERE user_id = %s;'
     try:
         cursor.execute(query, (user_id,))
         result = cursor.fetchall()
