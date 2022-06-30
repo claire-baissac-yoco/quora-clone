@@ -194,7 +194,7 @@ def get_followed_accounts(req: Request):
         try:
             followed_accounts = user_get_followed_accounts(
                 conn, cursor, user_id)
-            return {'success': True, 'message': 'Successfully followed user', 'data': followed_accounts}
+            return {'success': True, 'message': 'Successfully fetched followed accounts', 'data': followed_accounts}
         except:
             return JSONResponse(status_code=401, content={"success": False, "error": "Failed to fetch followed accounts"})
     return JSONResponse(status_code=401, content={"success": False, "error": "Failed to fetch followed accounts"})

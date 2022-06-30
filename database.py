@@ -117,6 +117,7 @@ def user_follow_account(conn, cursor, user_id: str, following_id: str) -> bool:
 
 
 def user_get_followed_accounts(conn, cursor, user_id: str):
+    print(f"get followed accounts for user {user_id}")
     query = 'SELECT "firstName", "lastName", public."Users".id FROM public."Users" INNER JOIN public.\"Followers\" ON public.\"Users\".id = public.\"Followers\".following_id WHERE public.\"Followers\".id = %s;'
     try:
         cursor.execute(query, (user_id,))
