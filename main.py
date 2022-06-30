@@ -3,8 +3,8 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 import os
 import uvicorn
-from models import ConfirmResetPassword, CreateUser, ResetPassword, User
-from database import fetch_user_data_from_email, insert_user, user_delete_account, user_follow_account, user_get_account_followers, user_get_followed_accounts, user_reset_password, validate_user_change_password, validate_user_login
+from models import ConfirmResetPassword, CreateUser, Question, ResetPassword, User
+from database import fetch_user_data_from_email, get_questions_for_user, insert_user, user_create_question, user_delete_account, user_follow_account, user_get_account_followers, user_get_followed_accounts, user_reset_password, validate_user_change_password, validate_user_login
 from db_script import connect_db, connect_redis
 import utils
 
@@ -214,6 +214,30 @@ def get_account_followers(req: Request):
         except:
             return JSONResponse(status_code=401, content={"success": False, "error": "Failed to fetch account followers"})
     return JSONResponse(status_code=401, content={"success": False, "error": "Failed to fetch account followers"})
+
+
+@app.post('/questions')
+def create_question(question: Question, req: Request):
+    verif_header = verify_header(req)
+    if isinstance(verif_header, JSONResponse):
+        return verif_header
+    authorized, _, user_id, _ = verif_header
+    if authorized:
+        if user_create_question(conn, cursor, user_id, question.title, question.description):
+            return {'success': True, 'message': 'Successfully created question'}
+    return JSONResponse(status_code=401, content={"success": False, "error": "Failed to create question"})
+
+
+@app.get('/questions')
+def fetch_questions(user_id: str, req: Request):
+    verif_header = verify_header(req)
+    if isinstance(verif_header, JSONResponse):
+        return verif_header
+    authorized, _, user_id, _ = verif_header
+    if authorized:
+        user_questions = get_questions_for_user(conn, cursor, user_id)
+        return {'success': True, 'message': 'Successfully created question', 'data': user_questions}
+    return JSONResponse(status_code=401, content={"success": False, "error": "Failed to create question"})
 
 
 @app.exception_handler(404)

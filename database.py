@@ -146,5 +146,30 @@ def user_get_account_followers(conn, cursor, user_id: str):
         print(e)
 
 
+def user_create_question(conn, cursor, user_id, title, description):
+    query = 'INSERT INTO public."Questions" ("user_id", "title", "description") VALUES (%s, %s, %s);'
+    try:
+        cursor.execute(query, (user_id, title, description))
+        conn.commit()
+        return True
+    except Exception as e:
+        print("Failed to insert into table")
+        print(e)
+
+
+def get_questions_for_user(conn, cursor, user_id):
+    query = 'SELECT "title", "description", "id" FROM public.Questions WHERE user_id = %s;'
+    try:
+        cursor.execute(query, (user_id,))
+        result = cursor.fetchall()
+        print(result)
+        dict_result = [{'id': r[2], 'title': r[0],
+                        'description': r[1]} for r in result]
+        return dict_result
+    except Exception as e:
+        print("Failed to fetch questions")
+        print(e)
+
+
 def close_db(conn):
     conn.close()

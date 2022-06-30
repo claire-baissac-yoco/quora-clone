@@ -21,3 +21,8 @@ class ConfirmResetPassword(BaseModel):
     email: str
     password: str
     code: str
+
+
+class Question(BaseModel):
+    title: str
+    description: str
